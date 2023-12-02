@@ -2,8 +2,8 @@
 using namespace std;
 #include <string>
 
-struct Person {
+struct Product {
+    string id;
     string name;
-    int age;
 };
 

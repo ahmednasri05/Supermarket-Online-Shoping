@@ -2,13 +2,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <iomanip>
-#include "models.h"
-#include "routes.h"
+#include "apis/api_users.h"
+#include "models/model_users.h"
 using namespace std;
 int main() {
-    Person person;
-    person.age = 5;
-    cout << person.age << endl;
-    cout << Greeting() << endl;
+    Greeting();
     return 0;
 }
