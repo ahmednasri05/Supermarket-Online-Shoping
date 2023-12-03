@@ -1,10 +1,26 @@
 #pragma once
 #include <iostream>
 #include "../models/model_users.h"
+#include "../database/database_conn.h"
+#include "../database/user_database.h"
 using namespace std;
 
+void CreateUser(sqlite3* db) {
+    Person user = {};
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "Enter Your Username: ";
+    getline(cin, user.Name);
+    cout << "Enter Your Password: ";
+    getline(cin, user.Password);
+    cout << "Enter Your Phone Number: ";
+    getline(cin, user.PhoneNumber);
+    cout << "Enter Your Location: ";
+    getline(cin, user.Location);
+    cout << endl;
+    saveUser(db, user);
+}
 
-int Greeting() {
+void Greeting(sqlite3* db) {
     int userActionChoice = 0;
     cout << "Welcome to the online super-market" << endl;
     cout << "To Edit Your Personal Info Press 1" << endl;
@@ -19,7 +35,8 @@ int Greeting() {
 
     switch (userActionChoice) {
         case 1:
-            cout << "You entered 1" << endl;
+            cout << "You Chose to enter user data" << endl;
+            CreateUser(db);
             break;
 
         case 2:
@@ -49,26 +66,12 @@ int Greeting() {
         default:
             cout << "Please Only Select A Number From The Menu" << endl;
             cout << endl;
-            Greeting();
+            Greeting(db);
     }
 
-    return 0;
 }
 
 
 
-int CreateUser() {
-    Person user;
-    cout << "Enter Your Username: ";
-    getline(cin, user.Name);
-    cout << "Enter Your Password: ";
-    getline(cin, user.Password);
-    cout << "Enter Your Phone Number: ";
-    getline(cin, user.PhoneNumber);
-    cout << "Enter Your Location: ";
-    getline(cin, user.Location);
-    cout << endl;
-    user.ID = "2";
-   return 0;
-}
+
 
