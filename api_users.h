@@ -6,6 +6,7 @@
 #include "database_conn.h"
 #include "user_database.h"
 #include "OpenDataBase.h"
+#include "api_products.h"
 using namespace std;
 
 void CreateUser(sqlite3* db) {
@@ -33,6 +34,8 @@ void Greeting(sqlite3* db) {
     cout << "To Modify Your Order Press 5" << endl;
     cout << "To Display The Order Total Price Press 6" << endl;
     cout << "To Logout From The App Press 7" << endl;
+    cout << "(For Admins Only) To Create a new Product press 8" << endl;
+    cout << "(For Admins Only) To Create a new category press 9" << endl;
 
     cin >> userActionChoice;
 
@@ -47,11 +50,13 @@ void Greeting(sqlite3* db) {
         break;
 
     case 3:
-        cout << "You entered 3" << endl;
+        cout << "You Chose to make an order" << endl;
+        Order(db);
         break;
 
     case 4:
-        cout << "You entered 4" << endl;
+        cout << "You Chose to review your order" << endl;
+        ViewUserOrders(db);
         break;
 
     case 5:
@@ -64,6 +69,21 @@ void Greeting(sqlite3* db) {
 
     case 7:
         cout << "You entered 7" << endl;
+        break;
+    
+    case 8:
+        cout << "You Chose to create a product" << endl;
+        CreateProduct(db);
+        break;
+
+    case 9:
+        cout << "You Chose to create a category" << endl;
+        CreateProductCategory(db);
+        break;
+
+     case 10:
+        cout << "You Chose to view categories" << endl;
+        ViewCategories(db);
         break;
 
     default:
