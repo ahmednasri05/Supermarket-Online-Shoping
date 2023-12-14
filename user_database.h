@@ -147,7 +147,7 @@ void updateProduct(sqlite3* db, Product product) {
     // Bind the parameters
     sqlite3_bind_int(stmt, 0, product.Quantity);
     
-    cout << "The New Q " << product.Quantity << " code " << product.Code << endl;
+    
     // Execute the UPDATE query
     int result = sqlite3_step(stmt);
     if (result != SQLITE_DONE) {

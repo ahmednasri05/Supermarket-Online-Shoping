@@ -66,7 +66,10 @@ void Order(sqlite3* db) {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "To Choose the product press its id: ";
     cin >> input;
-
+    if (input == -1) {
+        exitVal = -1;
+        continue;
+    }
     //Get the product from the database to check its expiration date
     //and quanity
     requiredProduct = getProductById(db, to_string(input));
@@ -140,9 +143,9 @@ void Order(sqlite3* db) {
         saveOrder(db, dynamicArray[i]);
     }
     //Display the order
-    cout << "Product Name" << setw(10) << "Quantity" << "Product Price" << endl;
+    cout << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
     for (int i = 0; i < dynamicArray.size(); i++) {
-        cout <<dynamicArray[i].ProductName << setw(15) << dynamicArray[i].Quantity << setw(15) << dynamicArray[i].Price << endl;
+        cout <<dynamicArray[i].ProductName << setw(15) << dynamicArray[i].Quantity << setw(10) << dynamicArray[i].Price << endl;
     }
     cout << "Total Price: " << totalPrice << endl;
     
