@@ -52,6 +52,7 @@ void Order(sqlite3* db) {
     
     //ProductCategory category = {};
     UserOrder userOrder = {};
+    vector<UserOrder> pendingOrder;
     Product requiredProduct = {};
     Date myDate = {};
     int input = 0;
@@ -97,7 +98,12 @@ void Order(sqlite3* db) {
         cout << "This Product is out of stock" << endl;
         continue;
     }
-
+    //!!!!!!!!!!! REMEMBER TO CHANGE THE USER ID !!!!!!!!!!!
+    pendingOrder = userOrdersByID(db, to_string(2));
+    if (pendingOrder.size() != 0) {
+        cout << "There is a pending order please confirm the purchase or delete it" << endl;
+        return;
+    }
     cout << "Choose the quantity you want: ";
     int quantity;
     cin >> quantity;
@@ -114,7 +120,7 @@ void Order(sqlite3* db) {
     //!!!!!!!!!!! REMEMBER TO CHANGE THE USER ID !!!!!!!!!!!
     //Assign the order
     userOrder.UserID = 2;
-    userOrder.ProductID = input;
+    userOrder.ProductID = to_string(input);
     userOrder.Quantity = quantity;
     userOrder.ProductName = requiredProduct.Name;
     userOrder.Price = requiredProduct.Price * quantity;
@@ -152,13 +158,16 @@ void Order(sqlite3* db) {
 }
 
 void ViewUserOrders(sqlite3* db) {
-    int userID = 3;
+    int userID = 2;
+    int totalPrice = 0;
     vector<UserOrder> userOrders;
     userOrders = userOrdersByID(db, to_string(userID));
-    cout << "Product ID" << setw(10) << "Quantity" << endl;;
+    cout << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
     for (int i = 0; i < userOrders.size(); i++) {
-        cout << setw(5) <<userOrders[i].ProductID << setw(10) << userOrders[i].Quantity << endl;
+        cout <<userOrders[i].ProductName << setw(15) << userOrders[i].Quantity << setw(10) << userOrders[i].Price << endl;
+        totalPrice = totalPrice + userOrders[i].Price;
     }
+    cout << "Total Price: " << totalPrice << endl;
 }
 
 void CreateProductCategory(sqlite3* db) {

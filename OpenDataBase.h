@@ -37,7 +37,7 @@ sqlite3* openDataBase(string dbFileName)
 	}
 
 	//Orders Table
-	int reqOrder = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, product_id INTEGER, quantity INTEGER, product_name TEXT, product_price INTEGER)", NULL, NULL, NULL);
+	int reqOrder = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, code TEXT, quantity INTEGER, product_name TEXT, product_price INTEGER, purchased INTEGER CHECK (purchased IN (0, 1)) DEFAULT 0)", NULL, NULL, NULL);
     checkForError(db, reqOrder);
 	if (reqOrder == 1)
 	{

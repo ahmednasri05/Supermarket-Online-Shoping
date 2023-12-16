@@ -17,7 +17,7 @@ void saveUser(sqlite3* db, Person user)
 }
 
 void saveOrder(sqlite3* db, UserOrder userOrder) {
-	string query = "INSERT INTO orders (user_id , product_id, quantity, product_name, product_price) VALUES ('" + to_string(userOrder.UserID) + "', '" + to_string(userOrder.ProductID) + "', '" + to_string(userOrder.Quantity) + "', '" + userOrder.ProductName + "', '" + to_string(userOrder.Price) + "');";
+	string query = "INSERT INTO orders (user_id , code, quantity, product_name, product_price) VALUES ('" + to_string(userOrder.UserID) + "', '" + userOrder.ProductID + "', '" + to_string(userOrder.Quantity) + "', '" + userOrder.ProductName + "', '" + to_string(userOrder.Price) + "');";
 
 	int req = sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
 	checkForError(db, req);
@@ -26,7 +26,7 @@ void saveOrder(sqlite3* db, UserOrder userOrder) {
 vector<UserOrder> userOrdersByID(sqlite3* db, string userID) {
 	vector<UserOrder> userOrders;
     sqlite3_stmt* stmt;
-    string query = "SELECT user_id, product_id, quantity FROM orders WHERE user_id = '" + userID + "';";
+    string query = "SELECT quantity, product_name, product_price FROM orders WHERE user_id = '" + userID + "' AND purchased = 0;";
 
     int req = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
     if (req != SQLITE_OK) {
@@ -37,9 +37,15 @@ vector<UserOrder> userOrdersByID(sqlite3* db, string userID) {
     // Execute the SELECT query
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         UserOrder order;
-        order.UserID = sqlite3_column_int(stmt, 0);
-        order.ProductID = sqlite3_column_int(stmt, 1); // Assuming product_id is an integer column
-        order.Quantity = sqlite3_column_int(stmt, 2); // Assuming quantity is an integer column
+        order.Quantity = sqlite3_column_int(stmt, 0);
+         const unsigned char* productName = sqlite3_column_text(stmt, 1);
+
+        if (productName) {
+            // Convert the retrieved const char* to a C++ string and assign it to CategoryType
+            order.ProductName = reinterpret_cast<const char*>(productName);
+        }
+        order.Price = sqlite3_column_int(stmt, 2); // Assuming product_id is an integer column
+         // Assuming quantity is an integer column
 
         // Add the UserOrder object to the array
         userOrders.push_back(order);
