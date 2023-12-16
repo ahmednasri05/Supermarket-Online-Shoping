@@ -51,7 +51,7 @@ bool dateChekcer(Date date) {
 
 void Order(sqlite3* db) {
     
-    //ProductCategory category = {};
+    
     UserOrder userOrder = {};
     vector<UserOrder> pendingOrder;
     Product requiredProduct = {};
@@ -69,10 +69,12 @@ void Order(sqlite3* db) {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "To Choose the product press its id: ";
     cin >> input;
+
     if (input == -1) {
         exitVal = -1;
         continue;
     }
+
     //Get the product from the database to check its expiration date
     //and quanity
     requiredProduct = getProductById(db, to_string(input));
