@@ -60,7 +60,8 @@ void Greeting(sqlite3* db) {
         break;
 
     case 5:
-        cout << "You entered 5" << endl;
+        cout << "You chose to edit your order" << endl;
+        EditOrder(db);
         break;
 
     case 6:

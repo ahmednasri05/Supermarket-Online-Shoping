@@ -30,5 +30,6 @@ struct UserOrder {
     string ProductID;
     int Quantity;
     string ProductName;
+    int ItemCode;
 };
 

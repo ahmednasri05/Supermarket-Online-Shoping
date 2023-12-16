@@ -6,6 +6,7 @@
 #include <ctime>
 #include <vector>
 #include <sstream>
+#include <iomanip>
 #include "model_products.h"
 #include "database_conn.h"
 #include "user_database.h"
@@ -58,6 +59,7 @@ void Order(sqlite3* db) {
     int input = 0;
     int exitVal = 0;
     int totalPrice = 0;
+    int itemCounter = 1;
     vector<UserOrder> dynamicArray;
     // While the user didn't exit continue to take orders
     while (exitVal != -1) {
@@ -124,6 +126,8 @@ void Order(sqlite3* db) {
     userOrder.Quantity = quantity;
     userOrder.ProductName = requiredProduct.Name;
     userOrder.Price = requiredProduct.Price * quantity;
+    userOrder.ItemCode = itemCounter;
+    itemCounter++;
     totalPrice = totalPrice + userOrder.Price;
     //Push the order into an array to take another order
     dynamicArray.push_back(userOrder);
@@ -149,25 +153,76 @@ void Order(sqlite3* db) {
         saveOrder(db, dynamicArray[i]);
     }
     //Display the order
-    cout << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
+    cout << "ItemCode" << setw(10) << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
     for (int i = 0; i < dynamicArray.size(); i++) {
-        cout <<dynamicArray[i].ProductName << setw(15) << dynamicArray[i].Quantity << setw(10) << dynamicArray[i].Price << endl;
+        cout << dynamicArray[i].ItemCode << setw(10) <<dynamicArray[i].ProductName << setw(15) << dynamicArray[i].Quantity << setw(10) << dynamicArray[i].Price << endl;
     }
     cout << "Total Price: " << totalPrice << endl;
     
 }
 
 void ViewUserOrders(sqlite3* db) {
+    //!!!!!!!!!!! REMEMBER TO CHANGE THE USER ID !!!!!!!!!!!
     int userID = 2;
     int totalPrice = 0;
     vector<UserOrder> userOrders;
     userOrders = userOrdersByID(db, to_string(userID));
-    cout << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
+    cout << "ItemCode" << setw(12) << "ProductName" << setw(10) << "Quantity" << setw(10) << "ItemPrice" << endl;
     for (int i = 0; i < userOrders.size(); i++) {
-        cout <<userOrders[i].ProductName << setw(15) << userOrders[i].Quantity << setw(10) << userOrders[i].Price << endl;
+        cout << userOrders[i].ItemCode << setw(20) << userOrders[i].ProductName << setw(9) << userOrders[i].Quantity << setw(9) << userOrders[i].Price << endl;
         totalPrice = totalPrice + userOrders[i].Price;
     }
     cout << "Total Price: " << totalPrice << endl;
+}
+
+void EditOrder(sqlite3* db) {
+    //!!!!!!!!!!! REMEMBER TO CHANGE THE USER ID !!!!!!!!!!!
+    int userID = 2;
+    cout << "To Remove an item press 1" << endl;
+    cout << "To Edit an item's quantity press 2" << endl;
+    int input = 0;
+    int itemCode = 0;
+    Product requiredProduct = {};
+    vector<UserOrder> userOrders;
+    UserOrder userOrder = {};
+    int oldQuantity = 0;
+    int newQuantity = 0;
+    userOrders = userOrdersByID(db, to_string(userID));
+
+    cin >> input;
+      while (input != 1 && input != 2) {
+        cout << "Please only select between 1 and 2 for different category and 1 to continue" << endl;
+        cin >> input;
+    }
+    cout << "Please Enter the item code: ";
+    cin >> itemCode;
+
+    for (int i = 0; i < userOrders.size(); i++) {
+        if (userOrders[i].ItemCode == itemCode ) {
+            userOrder = userOrders[i];
+        }
+    }
+    if (input == 1) {
+        cout << "DELETECode " << userOrder.ProductID << " DELETEITEM " << userOrder.ItemCode << endl;
+        deleteOrderItem(db, userOrder.ProductID, userOrder.ItemCode);
+    }
+    if (input == 2) {
+        cout << "Please Enter the new quantity: ";
+        cin >> newQuantity;
+        
+        requiredProduct = getProductById(db, userOrder.ProductID);
+        requiredProduct.Quantity = requiredProduct.Quantity + oldQuantity;
+        requiredProduct.Quantity = requiredProduct.Quantity - newQuantity;
+        
+        userOrder.Price = newQuantity * requiredProduct.Price;
+        userOrder.Quantity = newQuantity;
+       
+        updateOrder(db, userOrder);
+    }
+
+     
+    
+    cout << "Data updated successfully" << endl;;
 }
 
 void CreateProductCategory(sqlite3* db) {

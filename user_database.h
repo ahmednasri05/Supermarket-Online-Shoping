@@ -17,7 +17,7 @@ void saveUser(sqlite3* db, Person user)
 }
 
 void saveOrder(sqlite3* db, UserOrder userOrder) {
-	string query = "INSERT INTO orders (user_id , code, quantity, product_name, product_price) VALUES ('" + to_string(userOrder.UserID) + "', '" + userOrder.ProductID + "', '" + to_string(userOrder.Quantity) + "', '" + userOrder.ProductName + "', '" + to_string(userOrder.Price) + "');";
+	string query = "INSERT INTO orders (item_id, user_id , code, quantity, product_name, product_price) VALUES ('" + to_string(userOrder.ItemCode) + "', '" + to_string(userOrder.UserID) + "', '" + userOrder.ProductID + "', '" + to_string(userOrder.Quantity) + "', '" + userOrder.ProductName + "', '" + to_string(userOrder.Price) + "');";
 
 	int req = sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
 	checkForError(db, req);
@@ -26,7 +26,7 @@ void saveOrder(sqlite3* db, UserOrder userOrder) {
 vector<UserOrder> userOrdersByID(sqlite3* db, string userID) {
 	vector<UserOrder> userOrders;
     sqlite3_stmt* stmt;
-    string query = "SELECT quantity, product_name, product_price FROM orders WHERE user_id = '" + userID + "' AND purchased = 0;";
+    string query = "SELECT quantity, product_name, product_price, item_id, code FROM orders WHERE user_id = '" + userID + "' AND purchased = 0;";
 
     int req = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
     if (req != SQLITE_OK) {
@@ -46,7 +46,13 @@ vector<UserOrder> userOrdersByID(sqlite3* db, string userID) {
         }
         order.Price = sqlite3_column_int(stmt, 2); // Assuming product_id is an integer column
          // Assuming quantity is an integer column
+        order.ItemCode = sqlite3_column_int(stmt, 3); 
 
+        const unsigned char* productCode = sqlite3_column_text(stmt, 4);
+        if (productCode) {
+            // Convert the retrieved const char* to a C++ string and assign it to CategoryType
+            order.ProductID = reinterpret_cast<const char*>(productCode);
+        }
         // Add the UserOrder object to the array
         userOrders.push_back(order);
     }
@@ -54,6 +60,11 @@ vector<UserOrder> userOrdersByID(sqlite3* db, string userID) {
 	return userOrders;
 }
 
+void deleteOrderItem(sqlite3* db, string code, int itemCode) {
+    string query = "DELETE FROM orders where code = '" + code + "' AND item_id = '" + to_string(itemCode) + "';" ;
+    int req = sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+	checkForError(db, req);
+}
 void saveCategory(sqlite3* db, ProductCategory category) {
 	string query = "INSERT INTO categories (category) VALUES ('" + category.CategoryType + "');";
 
@@ -152,6 +163,31 @@ void updateProduct(sqlite3* db, Product product) {
 
     // Bind the parameters
     sqlite3_bind_int(stmt, 0, product.Quantity);
+    
+    
+    // Execute the UPDATE query
+    int result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        std::cerr << "Error updating data: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+    sqlite3_finalize(stmt); // Finalize the prepared statement
+}
+
+void updateOrder(sqlite3* db, UserOrder order) {
+    sqlite3_stmt* stmt;
+    
+    string query = "UPDATE orders SET quantity = '" + to_string(order.Quantity) + "', product_price = '" + to_string(order.Price) + "' WHERE code = '" + order.ProductID + "' AND item_id = '" + to_string(order.ItemCode) + "';";
+    
+    int req = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+    if (req != SQLITE_OK) {
+        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
+        return;
+    }
+
+    // Bind the parameters
+    sqlite3_bind_int(stmt, 0, order.Quantity);
+    sqlite3_bind_int(stmt, 1, order.Price);
     
     
     // Execute the UPDATE query
