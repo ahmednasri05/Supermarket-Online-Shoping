@@ -20,34 +20,34 @@ int generateID() {
     return rand();
 }
 
-bool dateChekcer(Date date) {
-    time_t currentTime = std::time(nullptr);
-
-    // Convert the current time to a calendar time
-    tm* currentCalendarTime = std::localtime(&currentTime);
-
-    // Extract the year from the calendar time
-    int currentYear = currentCalendarTime->tm_year + 1900; // tm_year is years since 1900
-
-    int currentMonth = currentCalendarTime->tm_mon + 1; 
-
-    int currentDay = currentCalendarTime->tm_mday;
-    // cout << "Year " << currentYear << " Month " << currentMonth << " Day " << currentDay <<endl;
-    // cout << "EYear " << date.year << " EMonth " << date.month << " EDay " << date.day <<endl;
-    if (date.year < currentYear) {
-        return false;
-    }
-    if (date.year == currentYear && date.month < currentMonth) {
-        return false;
-    }
-
-     if (date.year == currentYear && date.month == currentMonth && date.day < currentDay) {
-        return false;
-    }
-
-    return true;
-    
-}
+//bool dateChekcer(Date date) {
+//    time_t currentTime = std::time(nullptr);
+//
+//    // Convert the current time to a calendar time
+//    //tm* currentCalendarTime = std::localtime(&currentTime);
+//
+//    // Extract the year from the calendar time
+//    int currentYear = currentCalendarTime->tm_year + 1900; // tm_year is years since 1900
+//
+//    int currentMonth = currentCalendarTime->tm_mon + 1; 
+//
+//    int currentDay = currentCalendarTime->tm_mday;
+//    // cout << "Year " << currentYear << " Month " << currentMonth << " Day " << currentDay <<endl;
+//    // cout << "EYear " << date.year << " EMonth " << date.month << " EDay " << date.day <<endl;
+//    if (date.year < currentYear) {
+//        return false;
+//    }
+//    if (date.year == currentYear && date.month < currentMonth) {
+//        return false;
+//    }
+//
+//     if (date.year == currentYear && date.month == currentMonth && date.day < currentDay) {
+//        return false;
+//    }
+//
+//    return true;
+//    
+//}
 
 void Order(sqlite3* db) {
     
@@ -91,12 +91,12 @@ void Order(sqlite3* db) {
     ss >> myDate.day >> delimiter >> myDate.month >> delimiter >> myDate.year;
     //Function we created to check if the date of expiration has past and returns true
     //if it didn't expire and false if it did
-    bool dateChecker = dateChekcer(myDate);
+    //bool dateChecker = dateChekcer(myDate);
 
-    if (dateChecker == false) {
-        cout << "This Product is expired choose another product" << endl;;
-        continue;
-    }
+    ////if (dateChecker == false) {
+    //    cout << "This Product is expired choose another product" << endl;;
+    //    continue;
+    //}
     
     if (requiredProduct.Quantity == 0) {
         cout << "This Product is out of stock" << endl;
