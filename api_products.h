@@ -20,7 +20,6 @@ int generateID() {
     return rand();
 }
 
-<<<<<<< HEAD
 void ClearScreen() {
     system("clear"); // Command to clear the terminal on macOS
 }
@@ -54,8 +53,6 @@ void ClearScreen() {
 //    
 //}
 
-=======
->>>>>>> ef58412178fd5b69ebbeecbc862f56e08cc9a6e1
 void Order(sqlite3* db) {
     
     
@@ -145,6 +142,7 @@ void Order(sqlite3* db) {
     updateProduct(db, requiredProduct);
     //Display cart
     system("cls");
+    ClearScreen();
     cout << "ItemCode" << setw(10) << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
     for (int i = 0; i < dynamicArray.size(); i++) {
         cout << dynamicArray[i].ItemCode << setw(10) << dynamicArray[i].ProductName << setw(15) << dynamicArray[i].Quantity << setw(10) << dynamicArray[i].Price << endl;
@@ -244,10 +242,6 @@ void EditOrder(sqlite3* db) {
         
     }
     }
-    
-   
-    
-    
     
     if (input == 1) {
         cout << "DELETECode " << userOrder.ProductID << " DELETEITEM " << userOrder.ItemCode << endl;
