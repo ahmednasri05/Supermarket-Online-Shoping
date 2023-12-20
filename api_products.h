@@ -20,6 +20,7 @@ int generateID() {
     return rand();
 }
 
+<<<<<<< HEAD
 void ClearScreen() {
     system("clear"); // Command to clear the terminal on macOS
 }
@@ -53,6 +54,8 @@ void ClearScreen() {
 //    
 //}
 
+=======
+>>>>>>> ef58412178fd5b69ebbeecbc862f56e08cc9a6e1
 void Order(sqlite3* db) {
     
     
@@ -140,9 +143,16 @@ void Order(sqlite3* db) {
 
     //Update new product quantity
     updateProduct(db, requiredProduct);
-
+    //Display cart
+    system("cls");
+    cout << "ItemCode" << setw(10) << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
+    for (int i = 0; i < dynamicArray.size(); i++) {
+        cout << dynamicArray[i].ItemCode << setw(10) << dynamicArray[i].ProductName << setw(15) << dynamicArray[i].Quantity << setw(10) << dynamicArray[i].Price << endl;
+    }
+    cout << "Total Price: " << totalPrice << endl;
     cout <<  "\n" <<"To Exit press -1 " << endl;
     cout << "To Continue press -2 " << endl;
+
     cin >> exitVal;
 
     //Validation for the right input
@@ -150,7 +160,7 @@ void Order(sqlite3* db) {
         cout << "Please only select between -1 to exit -2 for different category and 1 to continue" << endl;
         cin >> exitVal;
     }
-
+     
     }
 
     cout << endl;
