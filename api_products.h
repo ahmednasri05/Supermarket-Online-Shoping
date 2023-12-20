@@ -20,6 +20,10 @@ int generateID() {
     return rand();
 }
 
+void ClearScreen() {
+    system("clear"); // Command to clear the terminal on macOS
+}
+
 //bool dateChekcer(Date date) {
 //    time_t currentTime = std::time(nullptr);
 //
@@ -169,6 +173,10 @@ void ViewUserOrders(sqlite3* db) {
     int totalPrice = 0;
     vector<UserOrder> userOrders;
     userOrders = userOrdersByID(db, to_string(userID));
+    if (userOrders.size() == 0) {
+        cout << "No Items in the cart" << endl;
+        return;
+    }
     cout << "ItemCode" << setw(12) << "ProductName" << setw(10) << "Quantity" << setw(10) << "ItemPrice" << endl;
     for (int i = 0; i < userOrders.size(); i++) {
         cout << userOrders[i].ItemCode << setw(20) << userOrders[i].ProductName << setw(9) << userOrders[i].Quantity << setw(9) << userOrders[i].Price << endl;
@@ -179,6 +187,9 @@ void ViewUserOrders(sqlite3* db) {
 
 void EditOrder(sqlite3* db) {
     //!!!!!!!!!!! REMEMBER TO CHANGE THE USER ID !!!!!!!!!!!
+    ClearScreen();
+    cout << "Your Order is:" << endl;
+    ViewUserOrders(db);
     int userID = 2;
     cout << "To Remove an item press 1" << endl;
     cout << "To Edit an item's quantity press 2" << endl;
@@ -196,14 +207,38 @@ void EditOrder(sqlite3* db) {
         cout << "Please only select between 1 and 2 for different category and 1 to continue" << endl;
         cin >> input;
     }
-    cout << "Please Enter the item code: ";
-    cin >> itemCode;
-
+    
+      
+  
+        cout << "Please Enter the item code: ";
+        cin >> itemCode;
+        //Loop over user orders
     for (int i = 0; i < userOrders.size(); i++) {
+        //Get the item with this code
         if (userOrders[i].ItemCode == itemCode ) {
             userOrder = userOrders[i];
         }
+        
     }
+    
+    while (userOrder.ItemCode == 0) {
+        cout << "Invalid ID" << endl;
+        cout << "Please Enter the item code: ";
+        cin >> itemCode;
+    //Loop over user orders
+    for (int i = 0; i < userOrders.size(); i++) {
+        //Get the item with this code
+        if (userOrders[i].ItemCode == itemCode ) {
+            userOrder = userOrders[i];
+        }
+        
+    }
+    }
+    
+   
+    
+    
+    
     if (input == 1) {
         cout << "DELETECode " << userOrder.ProductID << " DELETEITEM " << userOrder.ItemCode << endl;
         deleteOrderItem(db, userOrder.ProductID, userOrder.ItemCode);
