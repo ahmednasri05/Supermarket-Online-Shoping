@@ -20,35 +20,6 @@ int generateID() {
     return rand();
 }
 
-//bool dateChekcer(Date date) {
-//    time_t currentTime = std::time(nullptr);
-//
-//    // Convert the current time to a calendar time
-//    //tm* currentCalendarTime = std::localtime(&currentTime);
-//
-//    // Extract the year from the calendar time
-//    int currentYear = currentCalendarTime->tm_year + 1900; // tm_year is years since 1900
-//
-//    int currentMonth = currentCalendarTime->tm_mon + 1; 
-//
-//    int currentDay = currentCalendarTime->tm_mday;
-//    // cout << "Year " << currentYear << " Month " << currentMonth << " Day " << currentDay <<endl;
-//    // cout << "EYear " << date.year << " EMonth " << date.month << " EDay " << date.day <<endl;
-//    if (date.year < currentYear) {
-//        return false;
-//    }
-//    if (date.year == currentYear && date.month < currentMonth) {
-//        return false;
-//    }
-//
-//     if (date.year == currentYear && date.month == currentMonth && date.day < currentDay) {
-//        return false;
-//    }
-//
-//    return true;
-//    
-//}
-
 void Order(sqlite3* db) {
     
     
@@ -136,9 +107,16 @@ void Order(sqlite3* db) {
 
     //Update new product quantity
     updateProduct(db, requiredProduct);
-
+    //Display cart
+    system("cls");
+    cout << "ItemCode" << setw(10) << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
+    for (int i = 0; i < dynamicArray.size(); i++) {
+        cout << dynamicArray[i].ItemCode << setw(10) << dynamicArray[i].ProductName << setw(15) << dynamicArray[i].Quantity << setw(10) << dynamicArray[i].Price << endl;
+    }
+    cout << "Total Price: " << totalPrice << endl;
     cout <<  "\n" <<"To Exit press -1 " << endl;
     cout << "To Continue press -2 " << endl;
+
     cin >> exitVal;
 
     //Validation for the right input
@@ -146,7 +124,7 @@ void Order(sqlite3* db) {
         cout << "Please only select between -1 to exit -2 for different category and 1 to continue" << endl;
         cin >> exitVal;
     }
-
+     
     }
 
     cout << endl;
