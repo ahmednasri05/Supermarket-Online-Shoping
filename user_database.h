@@ -17,7 +17,7 @@ void saveUser(sqlite3* db, Person user)
 }
 
 void saveOrder(sqlite3* db, UserOrder userOrder) {
-	string query = "INSERT INTO orders (item_id, user_id , code, quantity, product_name, product_price) VALUES ('" + to_string(userOrder.ItemCode) + "', '" + to_string(userOrder.UserID) + "', '" + userOrder.ProductID + "', '" + to_string(userOrder.Quantity) + "', '" + userOrder.ProductName + "', '" + to_string(userOrder.Price) + "');";
+	string query = "INSERT INTO orders (item_id, user_id , code, quantity, product_name, product_price) VALUES ('" + to_string(userOrder.ItemCode) + "', '" + userOrder.UserID + "', '" + userOrder.ProductID + "', '" + to_string(userOrder.Quantity) + "', '" + userOrder.ProductName + "', '" + to_string(userOrder.Price) + "');";
 
 	int req = sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
 	checkForError(db, req);
@@ -41,27 +41,30 @@ vector<UserOrder> userOrdersByID(sqlite3* db, string userID) {
          const unsigned char* productName = sqlite3_column_text(stmt, 1);
 
         if (productName) {
-            // Convert the retrieved const char* to a C++ string and assign it to CategoryType
+            //Convert the retrieved const char* to a C++ string 
             order.ProductName = reinterpret_cast<const char*>(productName);
         }
-        order.Price = sqlite3_column_int(stmt, 2); // Assuming product_id is an integer column
-         // Assuming quantity is an integer column
+        //Assign column 2 to price
+        order.Price = sqlite3_column_int(stmt, 2); 
+        //Assign column 3 to itemCode
         order.ItemCode = sqlite3_column_int(stmt, 3); 
 
         const unsigned char* productCode = sqlite3_column_text(stmt, 4);
         if (productCode) {
-            // Convert the retrieved const char* to a C++ string and assign it to CategoryType
             order.ProductID = reinterpret_cast<const char*>(productCode);
         }
-        // Add the UserOrder object to the array
+
+        //Add the UserOrder object to the array
         userOrders.push_back(order);
     }
+
     sqlite3_finalize(stmt); // Finalize the prepared statement
 	return userOrders;
 }
 
 void deleteOrderItem(sqlite3* db, string code, int itemCode) {
     string query = "DELETE FROM orders where code = '" + code + "' AND item_id = '" + to_string(itemCode) + "';" ;
+
     int req = sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
 	checkForError(db, req);
 }
@@ -161,7 +164,7 @@ void updateProduct(sqlite3* db, Product product) {
         return;
     }
 
-    // Bind the parameters
+    //Bind the parameters
     sqlite3_bind_int(stmt, 0, product.Quantity);
     
     
@@ -197,4 +200,44 @@ void updateOrder(sqlite3* db, UserOrder order) {
     }
 
     sqlite3_finalize(stmt); // Finalize the prepared statement
+}
+
+Person getUserNameAndPass(sqlite3* db, Person user) {
+	Person dbUser;
+    sqlite3_stmt* stmt;
+    string query = "SELECT id, name, password FROM users WHERE name = '" + user.Name + "' AND password = '" + user.Password + "';";
+
+    int req = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+    if (req != SQLITE_OK) {
+        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
+        return user;
+    }
+
+    // Execute the SELECT query
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        UserOrder order;
+
+        const unsigned char* id = sqlite3_column_text(stmt, 0);
+        if (id) {
+            // Convert the retrieved const char* to a C++ string
+            user.ID = reinterpret_cast<const char*>(id);
+        }
+
+        const unsigned char* userName = sqlite3_column_text(stmt, 1);
+        if (userName) {
+            // Convert the retrieved const char* to a C++ string
+            user.Name = reinterpret_cast<const char*>(userName);
+        }
+
+        const unsigned char* password = sqlite3_column_text(stmt, 2);
+        if (password) {
+            // Convert the retrieved const char* to a C++ string 
+            user.Password = reinterpret_cast<const char*>(password);
+        }
+
+       
+    }
+    sqlite3_finalize(stmt); // Finalize the prepared statement
+
+	return user;
 }

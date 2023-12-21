@@ -15,8 +15,13 @@ using namespace std;
 
 
 int main() {
+    //Create Variable of type sqlite3
     sqlite3* db;
+    //Open database wich means to create db tables if not exist
     db = openDataBase("users1.db");
-    Greeting(db);
+    Greet(db);
+    //Main Menu funciton
+    //Greeting(db);
+
     return 0;
 }

@@ -11,6 +11,8 @@
 #include "database_conn.h"
 #include "user_database.h"
 #include "OpenDataBase.h"
+#include "api_users.h"
+//#include "main.cpp"
 
 using namespace std;
 
@@ -22,63 +24,57 @@ int generateID() {
 
 void ClearScreen() {
     system("clear"); // Command to clear the terminal on macOS
+    system("cls");  // Command to clear the terminal on windows
 }
 
-//bool dateChekcer(Date date) {
-//    time_t currentTime = std::time(nullptr);
-//
-//    // Convert the current time to a calendar time
-//    //tm* currentCalendarTime = std::localtime(&currentTime);
-//
-//    // Extract the year from the calendar time
-//    int currentYear = currentCalendarTime->tm_year + 1900; // tm_year is years since 1900
-//
-//    int currentMonth = currentCalendarTime->tm_mon + 1; 
-//
-//    int currentDay = currentCalendarTime->tm_mday;
-//    // cout << "Year " << currentYear << " Month " << currentMonth << " Day " << currentDay <<endl;
-//    // cout << "EYear " << date.year << " EMonth " << date.month << " EDay " << date.day <<endl;
-//    if (date.year < currentYear) {
-//        return false;
-//    }
-//    if (date.year == currentYear && date.month < currentMonth) {
-//        return false;
-//    }
-//
-//     if (date.year == currentYear && date.month == currentMonth && date.day < currentDay) {
-//        return false;
-//    }
-//
-//    return true;
-//    
-//}
+void mainMenuRedirection(sqlite3* db, string userId) {
+    
+    cout << "To return to main menu press 0" << endl;
+    cout << "To exit the app press any other key" << endl;
+    int mainMenu;
+    cin >> mainMenu;
+    void Greeting(sqlite3* db, string userId);
+    if (mainMenu == 0) {
+        ClearScreen();
+        //Return to main menu
+         Greeting(db, userId);
+    }
+}
 
-void Order(sqlite3* db) {
-    
-    
+void Order(sqlite3* db, string userId, bool edit) {
+    cout << "THIS IS YOUR ADD TO CART FUNCTION" << endl << endl;
+    //Single order which represents order of each loop
     UserOrder userOrder = {};
+    //Previous Orders in cart
     vector<UserOrder> pendingOrder;
+    //All orders in cart
+    vector<UserOrder> dynamicArray;
+    //The Product that the user chose
     Product requiredProduct = {};
     Date myDate = {};
+    //Item Code
     int input = 0;
+    //cout <<  "Input =" << input << endl;
+    //Ordered quantity
+    int quantity = 0;
     int exitVal = 0;
     int totalPrice = 0;
     int itemCounter = 1;
-    vector<UserOrder> dynamicArray;
-    // While the user didn't exit continue to take orders
-    while (exitVal != -1) {
 
-    exitVal = 0;
+    //While the user didn't exit continue to take orders
+    while (input != -1 && quantity != -1) {
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    cout << "To Choose the product press its id: ";
+    cout << "To add product to cart press its id: ";
+    input = 0;
     cin >> input;
-
+    //cout <<  "Input =" << input << endl;
     if (input == -1) {
-        exitVal = -1;
+        input = -1;
         continue;
     }
 
+    //cout <<  "Input =" << input << endl;
     //Get the product from the database to check its expiration date
     //and quanity
     requiredProduct = getProductById(db, to_string(input));
@@ -88,34 +84,37 @@ void Order(sqlite3* db) {
         cout << "Invalid ID" << endl;
         continue;
     }
-    
+
     //Convert the string date to day month and year
     stringstream ss(requiredProduct.ExpirationDate);
     char delimiter;
     ss >> myDate.day >> delimiter >> myDate.month >> delimiter >> myDate.year;
-    //Function we created to check if the date of expiration has past and returns true
-    //if it didn't expire and false if it did
-    //bool dateChecker = dateChekcer(myDate);
 
-    ////if (dateChecker == false) {
-    //    cout << "This Product is expired choose another product" << endl;;
-    //    continue;
-    //}
-    
+    //Check if product out of stock
     if (requiredProduct.Quantity == 0) {
         cout << "This Product is out of stock" << endl;
         continue;
     }
+
     //!!!!!!!!!!! REMEMBER TO CHANGE THE USER ID !!!!!!!!!!!
-    pendingOrder = userOrdersByID(db, to_string(2));
+
+    //Get previous orders in cart for this user by his ID
+    pendingOrder = userOrdersByID(db, userId);
     if (pendingOrder.size() != 0) {
         cout << "There is a pending order please confirm the purchase or delete it" << endl;
-        return;
+        //return;
+        int largest = 0;
+        for (int i = 0; i < pendingOrder.size(); i++) {
+            if ( pendingOrder[i].ItemCode > largest) {
+                largest = pendingOrder[i].ItemCode;
+            }
+        }
+        itemCounter = itemCounter + largest;
     }
-    cout << "Choose the quantity you want: ";
-    int quantity;
-    cin >> quantity;
 
+    cout << "Choose the quantity you want: ";
+    cin >> quantity;
+    //Validate the quantity
     while (requiredProduct.Quantity < quantity) {
         cout << "The Only available quantity is " << requiredProduct.Quantity << endl;
         cout << "Choose a smaller quantity: ";
@@ -126,8 +125,9 @@ void Order(sqlite3* db) {
     requiredProduct.Quantity = requiredProduct.Quantity - quantity;
 
     //!!!!!!!!!!! REMEMBER TO CHANGE THE USER ID !!!!!!!!!!!
-    //Assign the order
-    userOrder.UserID = 2;
+
+    //Assign the order to order struct
+    userOrder.UserID = userId;
     userOrder.ProductID = to_string(input);
     userOrder.Quantity = quantity;
     userOrder.ProductName = requiredProduct.Name;
@@ -140,24 +140,20 @@ void Order(sqlite3* db) {
 
     //Update new product quantity
     updateProduct(db, requiredProduct);
+
     //Display cart
-    system("cls");
     ClearScreen();
-    cout << "ItemCode" << setw(10) << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
+    cout << "ItemCode" << setw(30) << "ProductName" << setw(30) << "Quantity" << setw(30) <<"Product Price" << endl;
     for (int i = 0; i < dynamicArray.size(); i++) {
-        cout << dynamicArray[i].ItemCode << setw(10) << dynamicArray[i].ProductName << setw(15) << dynamicArray[i].Quantity << setw(10) << dynamicArray[i].Price << endl;
+        cout << dynamicArray[i].ItemCode << setw(30) << dynamicArray[i].ProductName << setw(30) << dynamicArray[i].Quantity << setw(30) << dynamicArray[i].Price << endl;
+    }
+    for (int i = 0; i < pendingOrder.size(); i++) {
+        cout << pendingOrder[i].ItemCode << setw(30) << pendingOrder[i].ProductName << setw(30) << pendingOrder[i].Quantity << setw(30) << pendingOrder[i].Price << endl;
+        totalPrice = totalPrice + pendingOrder[i].Price;
     }
     cout << "Total Price: " << totalPrice << endl;
     cout <<  "\n" <<"To Exit press -1 " << endl;
-    cout << "To Continue press -2 " << endl;
-
-    cin >> exitVal;
-
-    //Validation for the right input
-    while (exitVal != 1 && exitVal != -1 && exitVal != -2) {
-        cout << "Please only select between -1 to exit -2 for different category and 1 to continue" << endl;
-        cin >> exitVal;
-    }
+   
      
     }
 
@@ -166,85 +162,118 @@ void Order(sqlite3* db) {
     for (int i = 0; i < dynamicArray.size(); i++) {
         saveOrder(db, dynamicArray[i]);
     }
-    //Display the order
-    cout << "ItemCode" << setw(10) << "ProductName" << setw(10) << "Quantity" << "Product Price" << endl;
-    for (int i = 0; i < dynamicArray.size(); i++) {
-        cout << dynamicArray[i].ItemCode << setw(10) <<dynamicArray[i].ProductName << setw(15) << dynamicArray[i].Quantity << setw(10) << dynamicArray[i].Price << endl;
-    }
-    cout << "Total Price: " << totalPrice << endl;
     
+
+    cout << "Thank you for your Purchase" << endl;
+    if (edit == true) {
+        cout << "Redirecting to edit order to proceed" << endl;
+        return;
+    }
+    mainMenuRedirection(db, userId);
+  
 }
 
-void ViewUserOrders(sqlite3* db) {
+void ViewUserOrders(sqlite3* db, bool view, string userId) {
+    if (view == false) {
+         ClearScreen();
+    }
+   
     //!!!!!!!!!!! REMEMBER TO CHANGE THE USER ID !!!!!!!!!!!
-    int userID = 2;
+
+    string userID = userId;
     int totalPrice = 0;
     vector<UserOrder> userOrders;
-    userOrders = userOrdersByID(db, to_string(userID));
+    //Get user orders with his ID
+    userOrders = userOrdersByID(db, userID);
     if (userOrders.size() == 0) {
         cout << "No Items in the cart" << endl;
         return;
     }
-    cout << "ItemCode" << setw(12) << "ProductName" << setw(10) << "Quantity" << setw(10) << "ItemPrice" << endl;
+
+    //Display the cart
+    cout << "ItemCode" << setw(30) << "ProductName" << setw(30) << "Quantity" << setw(30) << "ItemPrice" << endl;
     for (int i = 0; i < userOrders.size(); i++) {
-        cout << userOrders[i].ItemCode << setw(20) << userOrders[i].ProductName << setw(9) << userOrders[i].Quantity << setw(9) << userOrders[i].Price << endl;
+        cout << userOrders[i].ItemCode << setw(30) << userOrders[i].ProductName << setw(30) << userOrders[i].Quantity << setw(30) << userOrders[i].Price << endl;
         totalPrice = totalPrice + userOrders[i].Price;
     }
     cout << "Total Price: " << totalPrice << endl;
+
+    //Checker that tells if this function is called as a feature to display order
+    //Or only display function that is used in other blocks
+    if (view == false) {
+
+    mainMenuRedirection(db, userId);
+
+    }
+    
 }
 
-void EditOrder(sqlite3* db) {
+void EditOrder(sqlite3* db, string userId) {
     //!!!!!!!!!!! REMEMBER TO CHANGE THE USER ID !!!!!!!!!!!
+    //ClearScreen();
+    cout << "THIS IS YOUR EDIT ORDER FUNCTION" << endl << endl;
+    
+    int exitVal = 0;
+    while(exitVal != - 1) {
     ClearScreen();
     cout << "Your Order is:" << endl;
-    ViewUserOrders(db);
-    int userID = 2;
+    ViewUserOrders(db, true, userId);
     cout << "To Remove an item press 1" << endl;
     cout << "To Edit an item's quantity press 2" << endl;
+    cout << "To Add a new item press 3" << endl;
+    //User choice 
     int input = 0;
+
     int itemCode = 0;
+    //Chosen product struct
     Product requiredProduct = {};
+    //Previous order to modify
     vector<UserOrder> userOrders;
+
     UserOrder userOrder = {};
     int oldQuantity = 0;
     int newQuantity = 0;
-    userOrders = userOrdersByID(db, to_string(userID));
+    userOrders = userOrdersByID(db, userId);
 
     cin >> input;
-      while (input != 1 && input != 2) {
-        cout << "Please only select between 1 and 2 for different category and 1 to continue" << endl;
+
+      while (input != 1 && input != 2 && input != 3) {
+        cout << "Please only select between 1, 2 and 3 for different category and 1 to continue" << endl;
         cin >> input;
     }
     
-      
-  
-        cout << "Please Enter the item code: ";
-        cin >> itemCode;
-        //Loop over user orders
-    for (int i = 0; i < userOrders.size(); i++) {
-        //Get the item with this code
-        if (userOrders[i].ItemCode == itemCode ) {
-            userOrder = userOrders[i];
-        }
-        
+     if (input == 3) {
+        //Add to cart
+        Order(db, userId, true);
+        EditOrder(db, userId);
     }
-    
-    while (userOrder.ItemCode == 0) {
-        cout << "Invalid ID" << endl;
-        cout << "Please Enter the item code: ";
-        cin >> itemCode;
+  
+    cout << "Please Enter the item code: ";
+    cin >> itemCode;
+
     //Loop over user orders
     for (int i = 0; i < userOrders.size(); i++) {
         //Get the item with this code
         if (userOrders[i].ItemCode == itemCode ) {
             userOrder = userOrders[i];
-        }
-        
+        }     
     }
+    
+    while (userOrder.ItemCode == 0) {
+     cout << "Invalid ID" << endl;
+     cout << "Please Enter the item code: ";
+     cin >> itemCode;
+
+     //Loop over user orders
+     for (int i = 0; i < userOrders.size(); i++) {
+        //Get the item with this code
+        if (userOrders[i].ItemCode == itemCode ) {
+            userOrder = userOrders[i];
+        } 
+     }
     }
     
     if (input == 1) {
-        cout << "DELETECode " << userOrder.ProductID << " DELETEITEM " << userOrder.ItemCode << endl;
         deleteOrderItem(db, userOrder.ProductID, userOrder.ItemCode);
     }
     if (input == 2) {
@@ -263,7 +292,13 @@ void EditOrder(sqlite3* db) {
 
      
     
-    cout << "Data updated successfully" << endl;;
+    cout << "Data updated successfully" << endl;
+    cout << "To exit edit order press -1" << endl;
+    cout << "To continue press any other number" << endl;
+    cin >> exitVal;
+    }
+    mainMenuRedirection(db, userId);
+    
 }
 
 void CreateProductCategory(sqlite3* db) {
@@ -273,7 +308,6 @@ void CreateProductCategory(sqlite3* db) {
     getline(cin, category.CategoryType);
 
     saveCategory(db, category);
-    
 }
 
 void ViewCategories(sqlite3* db) {

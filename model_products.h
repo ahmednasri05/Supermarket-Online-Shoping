@@ -25,7 +25,7 @@ struct Product {
 };
 
 struct UserOrder {
-    int UserID;
+    string UserID;
     int Price;
     string ProductID;
     int Quantity;
