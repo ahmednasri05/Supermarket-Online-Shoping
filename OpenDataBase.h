@@ -28,6 +28,13 @@ sqlite3* openDataBase(string dbFileName)
 		cout << "products table does not exist, thus a new table was created." << endl;
 	}
 
+    //Products Info Table
+	int reqProductsInfo = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS products_info (id INTEGER PRIMARY KEY AUTOINCREMENT, product_name TEXT, product_code TEXT, description TEXT)", NULL, NULL, NULL);
+    checkForError(db, reqProductsInfo);
+	if (reqProductsInfo == 1)
+	{
+		cout << "products_info table does not exist, thus a new table was created." << endl;
+	}
 	//Categories Table
 	int reqCategory = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT)", NULL, NULL, NULL);
     checkForError(db, reqCategory);

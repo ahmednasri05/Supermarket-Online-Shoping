@@ -42,6 +42,11 @@ void mainMenuRedirection(sqlite3* db, string userId) {
     }
 }
 
+void ViewItemInfo(sqlite3* db, string barCode) {
+    ItemInfo itemInfo = {};
+    itemInfo = getProductInfo(db, barCode);
+    cout << "ProductName " << itemInfo.ProductName << " Desctription " << itemInfo.Description << endl;
+}
 
 void ViewProducts(sqlite3* db, string userId, bool view) {
     
@@ -55,6 +60,25 @@ void ViewProducts(sqlite3* db, string userId, bool view) {
     }
     cout << "===================================================================================================================================================================\n";
     if (view == false) {
+    cout << "===========================================\n";
+    cout << "To View an item's info press 1" << endl;
+    cout << "To Continue Press any other number" << endl;
+    cout << "===========================================\n";
+    int itemInfo = 0;
+    cin >> itemInfo;
+    while (itemInfo == 1) {
+    cout << "===========================================\n";
+    cout << "To View an item's info enter its bar code" << endl;
+    cout << "===========================================\n";
+    int barCode = 0;
+    cin >> barCode;
+        ViewItemInfo(db, to_string(barCode));
+    cout << "===========================================\n";
+    cout << "To View another item press 1" << endl;
+    cout << "To Exit press 0" << endl;
+    cout << "===========================================\n";
+    cin >> itemInfo;
+    }
         mainMenuRedirection(db, userId);
     }
     

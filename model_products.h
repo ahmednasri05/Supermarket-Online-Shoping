@@ -24,6 +24,13 @@ struct Product {
     string ExpirationDate;
 };
 
+struct ItemInfo {
+    string ID;
+    string ProductName;
+    string productCode;
+    string Description;
+};
+
 struct UserOrder {
     string UserID;
     int Price;

@@ -381,3 +381,43 @@ Person getUserByID(sqlite3* db, string userID) {
 
 	return dbUser;
 }
+
+ItemInfo getProductInfo(sqlite3* db, string productCode) {
+	ItemInfo itemInfo;
+    sqlite3_stmt* stmt;
+    string query = "SELECT product_name, product_code, description FROM products_info WHERE product_code = '" + productCode + "';";
+
+    int req = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+    if (req != SQLITE_OK) {
+        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
+        return itemInfo;
+    }
+    
+    // Execute the SELECT query
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        UserOrder order;
+       
+         const unsigned char* name = sqlite3_column_text(stmt, 0);
+
+        if (name) {
+            // Convert the retrieved const char* to a C++ stringe
+            itemInfo.ProductName = reinterpret_cast<const char*>(name);
+        }
+
+        const unsigned char* code = sqlite3_column_text(stmt, 1);
+
+        if (code) {
+            // Convert the retrieved const char* to a C++ string
+            itemInfo.productCode = reinterpret_cast<const char*>(code);
+        }
+
+        const unsigned char* description = sqlite3_column_text(stmt, 2);
+
+        if (description) {
+            // Convert the retrieved const char* to a C++ string 
+            itemInfo.Description = reinterpret_cast<const char*>(description);
+        }
+    }
+    sqlite3_finalize(stmt); // Finalize the prepared statement
+	return itemInfo;
+}

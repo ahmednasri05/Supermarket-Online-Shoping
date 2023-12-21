@@ -171,6 +171,7 @@ void Greeting(sqlite3* db, string userID) {
     cout << "====================================================\n";
     cout << "To Edit Your Personal Info Press 1" << endl;
     cout << "To View The Products Menu Press 2" << endl;
+    //cout << "To View further info about and item press 2" << endl;
     cout << "To Make An Order Press 3" << endl;
     cout << "To Review Your Order Press 4" << endl;
     cout << "To Modify Your Order Press 5" << endl;
@@ -190,7 +191,7 @@ void Greeting(sqlite3* db, string userID) {
         break;
     case 2:
 
-        cout << "You entered 2" << endl;
+        cout << "You Chose to view Products menu" << endl;
         ViewProducts(db, userID, false);
         break;
     case 3:
@@ -217,9 +218,9 @@ void Greeting(sqlite3* db, string userID) {
 
         break;
     case 7:
-
-        cout << "You entered 7" << endl;
-
+        ClearScreen();
+        cout << "You Chose to log out" << endl;
+        SignIn(db);
         break;
     case 8:
 
