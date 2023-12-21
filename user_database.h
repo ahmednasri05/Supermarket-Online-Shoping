@@ -94,7 +94,7 @@ vector<ProductCategory> getCategories(sqlite3* db) {
         const unsigned char* categoryTypeText = sqlite3_column_text(stmt, 1);
 
         if (categoryTypeText) {
-            // Convert the retrieved const char* to a C++ string and assign it to CategoryType
+            // Convert the retrieved const char* to a C++ string 
             category.CategoryType = reinterpret_cast<const char*>(categoryTypeText);
         }
         cout << "IDSS " << category.ID << endl;
@@ -132,21 +132,21 @@ Product getProductById(sqlite3* db, string productID) {
          const unsigned char* expirationDate = sqlite3_column_text(stmt, 2);
 
         if (expirationDate) {
-            // Convert the retrieved const char* to a C++ string and assign it to CategoryType
+            // Convert the retrieved const char* to a C++ stringe
             product.ExpirationDate = reinterpret_cast<const char*>(expirationDate);
         }
 
         const unsigned char* code = sqlite3_column_text(stmt, 3);
 
         if (code) {
-            // Convert the retrieved const char* to a C++ string and assign it to CategoryType
+            // Convert the retrieved const char* to a C++ string
             product.Code = reinterpret_cast<const char*>(code);
         }
 
         const unsigned char* productName = sqlite3_column_text(stmt, 4);
 
         if (productName) {
-            // Convert the retrieved const char* to a C++ string and assign it to CategoryType
+            // Convert the retrieved const char* to a C++ string 
             product.Name = reinterpret_cast<const char*>(productName);
         }
     }
@@ -240,4 +240,144 @@ Person getUserNameAndPass(sqlite3* db, Person user) {
     sqlite3_finalize(stmt); // Finalize the prepared statement
 
 	return user;
+}
+
+vector<Product> getProducts(sqlite3* db) {
+	vector<Product> products;
+    sqlite3_stmt* stmt;
+    string query = "SELECT * FROM products;";
+
+    int req = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+    if (req != SQLITE_OK) {
+        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
+        return products;
+    }
+
+    // Execute the SELECT query
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+
+        Product product;
+        product.ID = sqlite3_column_int(stmt, 0);
+        const unsigned char* productName = sqlite3_column_text(stmt, 1);
+
+        if (productName) {
+            // Convert the retrieved const char* to a C++ string 
+            product.Name = reinterpret_cast<const char*>(productName);
+        }
+        product.Price = sqlite3_column_int(stmt, 2);
+
+        const unsigned char* productCode = sqlite3_column_text(stmt, 4);
+
+        if (productCode) {
+            // Convert the retrieved const char* to a C++ string 
+            product.Code = reinterpret_cast<const char*>(productCode);
+        }
+
+        const unsigned char* categoryType = sqlite3_column_text(stmt, 5);
+
+        if (categoryType) {
+            // Convert the retrieved const char* to a C++ string 
+            product.CategoryType = reinterpret_cast<const char*>(categoryType);
+        }
+
+        const unsigned char* productionDate = sqlite3_column_text(stmt, 6);
+
+        if (productionDate) {
+            // Convert the retrieved const char* to a C++ string
+            product.ProductionDate = reinterpret_cast<const char*>(productionDate);
+        }
+
+        
+        const unsigned char* expirationDate = sqlite3_column_text(stmt, 7);
+
+        if (expirationDate) {
+            // Convert the retrieved const char* to a C++ string 
+            product.ExpirationDate = reinterpret_cast<const char*>(expirationDate);
+        }
+
+        // Add the UserOrder object to the array
+        products.push_back(product);
+    }
+    sqlite3_finalize(stmt); // Finalize the prepared statement
+	return products;
+}
+
+void updateUser(sqlite3* db, Person user) {
+    sqlite3_stmt* stmt;
+    
+    string query = "UPDATE users SET name = '" + user.Name + "', password = '" + user.Password + "', phone = '" + user.PhoneNumber + "', location = '" + user.Location + "' WHERE id = '" + user.ID + "';";
+    int req = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+    if (req != SQLITE_OK) {
+        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
+        return;
+    }
+
+    // Bind the parameters
+    sqlite3_bind_text(stmt, 0, user.Name.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, user.Password.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, user.PhoneNumber.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, user.Location.c_str(), -1, SQLITE_STATIC);
+    
+    
+    // Execute the UPDATE query
+    int result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        std::cerr << "Error updating data: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+    sqlite3_finalize(stmt); // Finalize the prepared statement
+}
+
+Person getUserByID(sqlite3* db, string userID) {
+	Person dbUser;
+    sqlite3_stmt* stmt;
+    string query = "SELECT id, name, password, phone, location FROM users WHERE id = '" + userID + "';";
+
+    int req = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+    if (req != SQLITE_OK) {
+        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
+        return dbUser;
+    }
+
+    // Execute the SELECT query
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        UserOrder order;
+
+        const unsigned char* id = sqlite3_column_text(stmt, 0);
+        if (id) {
+            // Convert the retrieved const char* to a C++ string
+            dbUser.ID = reinterpret_cast<const char*>(id);
+        }
+
+        const unsigned char* userName = sqlite3_column_text(stmt, 1);
+        if (userName) {
+            // Convert the retrieved const char* to a C++ string
+            dbUser.Name = reinterpret_cast<const char*>(userName);
+        }
+
+        const unsigned char* password = sqlite3_column_text(stmt, 2);
+        if (password) {
+            // Convert the retrieved const char* to a C++ string 
+            dbUser.Password = reinterpret_cast<const char*>(password);
+        }
+
+        const unsigned char* phone = sqlite3_column_text(stmt, 3);
+        if (phone) {
+            // Convert the retrieved const char* to a C++ string 
+            dbUser.PhoneNumber = reinterpret_cast<const char*>(phone);
+        }
+
+
+        const unsigned char* location = sqlite3_column_text(stmt, 4);
+        if (location) {
+            // Convert the retrieved const char* to a C++ string 
+            dbUser.Location = reinterpret_cast<const char*>(location);
+        }
+
+
+       
+    }
+    sqlite3_finalize(stmt); // Finalize the prepared statement
+
+	return dbUser;
 }
