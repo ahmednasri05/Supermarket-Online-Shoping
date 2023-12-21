@@ -131,7 +131,7 @@ int EditInformation(sqlite3* db, string userID)
     }
 
     updateUser(db, person);
-    //mainMenuRedirection(db, userID);
+    mainMenuRedirection(db, userID);
     return 0;
 }
 
@@ -177,8 +177,8 @@ void Greeting(sqlite3* db, string userID) {
     cout << "To Modify Your Order Press 5" << endl;
     cout << "To Display The Order Total Price Press 6" << endl;
     cout << "To Logout From The App Press 7" << endl;
-    cout << "(For Admins Only) To Create a new Product press 8" << endl;
-    cout << "(For Admins Only) To Create a new category press 9" << endl;
+    // cout << "(For Admins Only) To Create a new Product press 8" << endl;
+    // cout << "(For Admins Only) To Create a new category press 9" << endl;
     cout << "====================================================\n";
 
     cin >> userActionChoice;

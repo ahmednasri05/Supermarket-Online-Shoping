@@ -45,7 +45,9 @@ void mainMenuRedirection(sqlite3* db, string userId) {
 void ViewItemInfo(sqlite3* db, string barCode) {
     ItemInfo itemInfo = {};
     itemInfo = getProductInfo(db, barCode);
-    cout << "ProductName " << itemInfo.ProductName << " Desctription " << itemInfo.Description << endl;
+    cout << "ProductName: " << itemInfo.ProductName << endl; 
+    cout<< "Product code: " << itemInfo.productCode << endl; 
+    cout<< "Desctription " << itemInfo.Description << endl;
 }
 
 void ViewProducts(sqlite3* db, string userId, bool view) {
@@ -235,6 +237,7 @@ void ViewUserOrders(sqlite3* db, bool view, string userId) {
     userOrders = userOrdersByID(db, userID);
     if (userOrders.size() == 0) {
         cout << "No Items in the cart" << endl;
+        mainMenuRedirection(db, userId);
         return;
     }
 

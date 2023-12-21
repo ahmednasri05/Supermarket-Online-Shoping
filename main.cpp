@@ -19,9 +19,7 @@ int main() {
     sqlite3* db;
     //Open database wich means to create db tables if not exist
     db = openDataBase("users1.db");
+    //Function That manages signinng in and up
     Greet(db);
-    //Main Menu funciton
-    //Greeting(db);
-
     return 0;
 }
