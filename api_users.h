@@ -153,12 +153,21 @@ int EditInformation(sqlite3* db, string userID)
     return 0;
 }
 void Greet(sqlite3* db) {
-
+    int INTRO = 0;
     int input = 0;
     bool signedIn = false;
-    ClearScreen();
+    
 
     cout << "Welcome to the super-market App" << endl << endl;
+    if (INTRO == 0) {
+        coolWelcomeIntro();
+        enhancedSparklingFirework();
+        enjoyTextAnimation();
+        //system("pause");
+        setTextColor(ANSI_RESET);
+        INTRO++;
+    }
+    ClearScreen();
     cout << "=====================================\n";
     cout << "To sign up press 1" << endl;
     cout << "To sign in press 2" << endl;
@@ -183,19 +192,30 @@ void Greet(sqlite3* db) {
 void Greeting(sqlite3* db, string userID) {
     ClearScreen();
     int userActionChoice = 0;
-    cout << "Welcome to the online super-market App" << endl;
-    cout << endl;
-    cout << "====================================================\n";
-    cout << "To Edit Your Personal Info Press 1" << endl;
-    cout << "To View The Products Menu Press 2" << endl;
-    //cout << "To View further info about and item press 2" << endl;
-    cout << "To Make An Order Press 3" << endl;
-    cout << "To Review Your Order Press 4" << endl;
-    cout << "To Modify Your Order Press 5" << endl;
-    cout << "To Logout From The App Press 6" << endl;
-    // cout << "(For Admins Only) To Create a new Product press 8" << endl;
-    // cout << "(For Admins Only) To Create a new category press 9" << endl;
-    cout << "====================================================\n";
+    setTextColor(ANSI_CYAN);
+    printWithDelay("=================================================\n", 5);
+    printWithDelay("        Welcome to Online Supermarket         \n", 10);
+    printWithDelay("=================================================\n", 5);
+    setTextColor(ANSI_RESET);
+
+    cout << "\n";
+
+    setTextColor(ANSI_YELLOW);
+    printWithDelay("1. Edit Personal Info        [Press 1]\n", 10);
+    printWithDelay("2. View Products Menu        [Press 2]\n", 10);
+    printWithDelay("3. Make an Order             [Press 3]\n", 10);
+    printWithDelay("4. Review Your Order         [Press 4]\n", 10);
+    printWithDelay("5. Modify Your Order         [Press 5]\n", 10);
+    printWithDelay("6. Logout from the App       [Press 6]\n", 10);
+    setTextColor(ANSI_RESET);
+
+    cout << "\n";
+
+    setTextColor(ANSI_CYAN);
+    printWithDelay("=================================================\n", 10);
+    printWithDelay("Please enter the corresponding number to navigate:\n", 10);
+    printWithDelay("=================================================\n", 10);
+    setTextColor(ANSI_RESET);
 
     cin >> userActionChoice;
 
