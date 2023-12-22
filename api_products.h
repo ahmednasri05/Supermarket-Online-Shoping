@@ -27,24 +27,42 @@ void ClearScreen() {
     system("cls");  // Command to clear the terminal on windows
 }
 
+int cinFail(int input) {
+    while (cin.fail()) {
+        cin.clear(); // Clear error state
+        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Clear input buffer
+        // Handle invalid input here
+        cout << "Please only select numbers" << endl;
+        cin >> input;
+    }
+    return input;
+}
+
 void mainMenuRedirection(sqlite3* db, string userId) {
     cout << "===========================================\n";
-    cout << "To return to main menu press 0" << endl;
-    cout << "To exit the app press any other key" << endl;
+    cout << "To return to main menu press 1" << endl;
+    cout << "To exit the app press 0" << endl;
     cout << "===========================================\n";
     int mainMenu;
     cin >> mainMenu;
+    mainMenu = cinFail(mainMenu);
     void Greeting(sqlite3* db, string userId);
-    if (mainMenu == 0) {
+    if (mainMenu == 1) {
         ClearScreen();
         //Return to main menu
          Greeting(db, userId);
+    } else {
+        return;
     }
 }
 
 void ViewItemInfo(sqlite3* db, string barCode) {
     ItemInfo itemInfo = {};
     itemInfo = getProductInfo(db, barCode);
+    if (itemInfo.Description == "") {
+        cout << "Invalid bar code" << endl;
+        return;
+    }
     cout << "ProductName: " << itemInfo.ProductName << endl; 
     cout<< "Product code: " << itemInfo.productCode << endl; 
     cout<< "Desctription " << itemInfo.Description << endl;
@@ -64,22 +82,25 @@ void ViewProducts(sqlite3* db, string userId, bool view) {
     if (view == false) {
     cout << "===========================================\n";
     cout << "To View an item's info press 1" << endl;
-    cout << "To Continue Press any other number" << endl;
+    cout << "To Continue press 0" << endl;
     cout << "===========================================\n";
     int itemInfo = 0;
     cin >> itemInfo;
+    itemInfo = cinFail(itemInfo);
     while (itemInfo == 1) {
     cout << "===========================================\n";
     cout << "To View an item's info enter its bar code" << endl;
     cout << "===========================================\n";
     int barCode = 0;
     cin >> barCode;
+    barCode = cinFail(barCode);
         ViewItemInfo(db, to_string(barCode));
     cout << "===========================================\n";
     cout << "To View another item press 1" << endl;
     cout << "To Exit press 0" << endl;
     cout << "===========================================\n";
     cin >> itemInfo;
+    itemInfo = cinFail(itemInfo);
     }
         mainMenuRedirection(db, userId);
     }
@@ -112,11 +133,13 @@ void Order(sqlite3* db, string userId, bool edit) {
     while (input != -1 && quantity != -1) {
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    //cout << "INPUT " << input << endl;
     ViewProducts(db, userId, true);
+    cout <<"To exit press -1" << endl;
     cout << "To add product to cart enter its bar code: ";
     input = 0;
     cin >> input;
-    
+    input = cinFail(input);
     if (input == -1) {
         input = -1;
         continue;
@@ -162,11 +185,13 @@ void Order(sqlite3* db, string userId, bool edit) {
 
     cout << "Choose the quantity you want: ";
     cin >> quantity;
+    quantity = cinFail(quantity);
     //Validate the quantity
     while (requiredProduct.Quantity < quantity) {
         cout << "The Only available quantity is " << requiredProduct.Quantity << endl;
         cout << "Choose a smaller quantity: ";
         cin >> quantity;
+        quantity = cinFail(quantity);
     }
 
    //Update the quantity of the product 
@@ -202,7 +227,7 @@ void Order(sqlite3* db, string userId, bool edit) {
         totalPrice = totalPrice + pendingOrder[i].Price;
     }
     cout << "Total Price: " << totalPrice << endl;
-    cout <<  "\n" <<"To Exit press -1 " << endl;
+    cout <<  "\n" <<"TO EXIT PRESS -1 " << endl;
     cout << "===================================================================================================================================================================\n\n";
      
     }
@@ -274,6 +299,7 @@ void EditOrder(sqlite3* db, string userId) {
     cout << "To Remove an item press 1" << endl;
     cout << "To Edit an item's quantity press 2" << endl;
     cout << "To Add a new item press 3" << endl;
+    cout << "To Exit press -1" << endl;
     cout << "=====================================\n";
     //User choice 
     int input = 0;
@@ -290,10 +316,15 @@ void EditOrder(sqlite3* db, string userId) {
     userOrders = userOrdersByID(db, userId);
 
     cin >> input;
+    input = cinFail(input);
+    //   while (input != 1 && input != 2 && input != 3) {
+    //     cout << "Please only select between 1, 2 and 3" << endl;
+    //     cin >> input;
+    //     input = cinFail(input);
+    // }
 
-      while (input != 1 && input != 2 && input != 3) {
-        cout << "Please only select between 1, 2 and 3 for different category and 1 to continue" << endl;
-        cin >> input;
+    if (input == -1) {
+        mainMenuRedirection(db, userId);  
     }
     
      if (input == 3) {
@@ -304,7 +335,7 @@ void EditOrder(sqlite3* db, string userId) {
   
     cout << "Please Enter the item code: ";
     cin >> itemCode;
-
+    itemCode = cinFail(itemCode);
     //Loop over user orders
     for (int i = 0; i < userOrders.size(); i++) {
         //Get the item with this code
@@ -317,7 +348,7 @@ void EditOrder(sqlite3* db, string userId) {
      cout << "Invalid ID" << endl;
      cout << "Please Enter the item code: ";
      cin >> itemCode;
-
+     itemCode = cinFail(itemCode);
      //Loop over user orders
      for (int i = 0; i < userOrders.size(); i++) {
         //Get the item with this code
@@ -333,7 +364,7 @@ void EditOrder(sqlite3* db, string userId) {
     if (input == 2) {
         cout << "Please Enter the new quantity: ";
         cin >> newQuantity;
-        
+        newQuantity = cinFail(newQuantity);
         requiredProduct = getProductById(db, userOrder.ProductID);
         requiredProduct.Quantity = requiredProduct.Quantity + oldQuantity;
         requiredProduct.Quantity = requiredProduct.Quantity - newQuantity;
@@ -349,9 +380,10 @@ void EditOrder(sqlite3* db, string userId) {
     cout << "Data updated successfully" << endl;
     cout << "=====================================\n";
     cout << "To exit edit order press -1" << endl;
-    cout << "To Editing in your order press any other number" << endl;
+    cout << "To Continue Editing in your order press 0" << endl;
     cout << "=====================================\n";
     cin >> exitVal;
+    exitVal = cinFail(exitVal);
     }
     mainMenuRedirection(db, userId);
     

@@ -13,6 +13,7 @@ using namespace std;
 bool SignIn(sqlite3* db) {
     Person user = {};
     Person dbUser = {};
+    int exitVal = 0;
     cout << "This is the sign in page please sign in to proceed" << endl;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Enter your Username:";
@@ -23,15 +24,19 @@ bool SignIn(sqlite3* db) {
     dbUser = getUserNameAndPass(db, user);
     if (dbUser.ID == "") {
         cout << "Invalid user name or password" << endl << endl;
-        cout << "To exit press -1" << endl;
-        cout << "To Retry press any other key" << endl;
-        int exitVal = 0;
+        cout << "To exit press 1" << endl;
+        cout << "To Retry press 0" << endl;
+        
         cin >> exitVal;
-        if (exitVal == -1) {
+        exitVal = cinFail(exitVal);
+        if (exitVal == 1) {
             return false;
+        } else {
+            SignIn(db);
         }
-        SignIn(db);
+        
     }
+    cout << "Exit " << exitVal;
     cout << "You Have Logged in successfully";
     cout << "Redirecting to the main menu" << endl << endl;
      void Greeting(sqlite3* db, string userID);
@@ -63,78 +68,90 @@ int EditInformation(sqlite3* db, string userID)
     Person person;
     int choice, age;
     string name, password, phoneNumber, location;
+    char exit;
     person = getUserByID(db, userID);
+    bool exitVal = true;
+    while (exitVal)
+    {
+    ClearScreen();
     cout << "=====================================\n";
     cout << "choice 1 : edit your name\n";
     cout << "choice 2 : edit your password\n";
     cout << "choice 3 : edit your phone number\n";
     cout << "choice 4 : edit your location\n";
+    cout << "choice 5 : to exit\n";
     // cout << "choice 5 : edit your age\n";
     cout << "=====================================\n";
     cout << "Enter your choice\n";
 
     cin >> choice;
+    choice = cinFail(choice);
     person.ID = userID;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    switch (choice)
-    {
-    case 1 :
-        cout << "You're editing your name\n";
-        cout << "Enter your name\n";
+        switch (choice)
+        {
+        case 1:
+            cout << "You're editing your name\n";
+            cout << "Enter your name\n";
 
-        getline(cin, name);
+            getline(cin, name);
 
-        person.Name = name;
+            person.Name = name;
             // edit the name in the database
-         break;
+            break;
 
-    case 2 : 
-        cout << "You're editing your password\n";
-        cout << "Enter your new password\n";
+        case 2:
+            cout << "You're editing your password\n";
+            cout << "Enter your new password\n";
 
-        getline(cin, password);
+            getline(cin, password);
 
-        person.Password = password;
-        // edit the password
-        break;
+            person.Password = password;
+            // edit the password
+            break;
 
-    case 3 :
-        cout << "You're editing your phone number\n";
-        cout << "Enter your new phone number\n";
+        case 3:
+            cout << "You're editing your phone number\n";
+            cout << "Enter your new phone number\n";
 
-        getline(cin, phoneNumber);
+            getline(cin, phoneNumber);
 
-        person.PhoneNumber = phoneNumber;
-        // edit the phone number
-        break;
+            person.PhoneNumber = phoneNumber;
+            // edit the phone number
+            break;
 
-    case 4 :
-        cout << "You're editing your location\n";
-        cout << "Enter your new location\n";
+        case 4:
+            cout << "You're editing your location\n";
+            cout << "Enter your new location\n";
 
-        getline(cin, location);
+            getline(cin, location);
 
-        person.Location = location;
-        // edit the location
+            person.Location = location;
+            // edit the location
 
-        break;
+            break;
 
-    // case 5 : 
-    //     cout << "You're editing your age\n";
-    //     cout << "Enter your new age\n";
+        case 5 : 
+                 cout << "Do you want to exit? Y / N: ";
+                 cin >> exit;
 
-    //     cin >> age;
+                 if (exit == 'Y' || exit == 'y')
+                 {
+                    exitVal = false;
+                     break;
+                 }
+                 break;
 
-    //     person.Age = age;
-    default:
-        break;
+        default:
+            cout << "Only choose from 1 to 5" << endl;
+            break;
+        }
     }
 
     updateUser(db, person);
     mainMenuRedirection(db, userID);
     return 0;
 }
-
 void Greet(sqlite3* db) {
 
     int input = 0;
@@ -145,7 +162,7 @@ void Greet(sqlite3* db) {
     cout << "=====================================\n";
     cout << "To sign up press 1" << endl;
     cout << "To sign in press 2" << endl;
-    cout << "To exit the app press any other number" << endl;
+    cout << "To exit the app 0" << endl;
     cout << "=====================================\n";
     cin >> input;
 
@@ -175,8 +192,7 @@ void Greeting(sqlite3* db, string userID) {
     cout << "To Make An Order Press 3" << endl;
     cout << "To Review Your Order Press 4" << endl;
     cout << "To Modify Your Order Press 5" << endl;
-    cout << "To Display The Order Total Price Press 6" << endl;
-    cout << "To Logout From The App Press 7" << endl;
+    cout << "To Logout From The App Press 6" << endl;
     // cout << "(For Admins Only) To Create a new Product press 8" << endl;
     // cout << "(For Admins Only) To Create a new category press 9" << endl;
     cout << "====================================================\n";
@@ -212,33 +228,11 @@ void Greeting(sqlite3* db, string userID) {
         EditOrder(db, userID);
 
         break;
+    
     case 6:
-
-        cout << "You entered 6" << endl;
-
-        break;
-    case 7:
         ClearScreen();
         cout << "You Chose to log out" << endl;
         SignIn(db);
-        break;
-    case 8:
-
-        cout << "You Chose to create a product" << endl;
-        CreateProduct(db);
-
-        break;
-    case 9:
-
-        cout << "You Chose to create a category" << endl;
-        CreateProductCategory(db);
-
-        break;
-     case 10:
-
-        cout << "You Chose to view categories" << endl;
-        ViewCategories(db);
-
         break;
     default:
 
