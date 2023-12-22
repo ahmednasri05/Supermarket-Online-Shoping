@@ -62,6 +62,17 @@ void Signup(sqlite3* db) {
     SignIn(db);
 }
 
+int logout(sqlite3* db)
+{
+    ClearScreen();
+
+    cout << "Logging out";
+
+    SignIn(db);
+
+	return 0;
+}
+
 int EditInformation(sqlite3* db, string userID)
 {
 
@@ -250,9 +261,7 @@ void Greeting(sqlite3* db, string userID) {
         break;
     
     case 6:
-        ClearScreen();
-        cout << "You Chose to log out" << endl;
-        SignIn(db);
+        logout(db);
         break;
     default:
 

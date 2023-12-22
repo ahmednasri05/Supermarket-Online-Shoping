@@ -1,3 +1,4 @@
 ﻿  main.cpp
-C:\Users\shels\Documents\ShoppingAPP_Final\Supermarket-Online-Shoping\api_products.h(18,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  Online supermarket shoping.vcxproj -> C:\Users\shels\Documents\ShoppingAPP_Final\Supermarket-Online-Shoping\x64\Debug\Online supermarket shoping.exe
+C:\Users\himoa\source\repos\New folder\api_products.h(20,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\himoa\source\repos\New folder\api_users.h(80,17): warning C4101: 'age': unreferenced local variable
+  Online supermarket shoping.vcxproj -> C:\Users\himoa\source\repos\New folder\x64\Debug\Online supermarket shoping.exe
